@@ -1,7 +1,6 @@
 var app = angular.module("weatherApp", []);
 
 app.controller("weatherController", function($scope) {
-    $scope.title = "bonk"
     $scope.weather = parse_weather_from_api();
 });
 
