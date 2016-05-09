@@ -2,6 +2,15 @@ var app = angular.module("weatherApp", []);
 
 app.controller("weatherController", function($scope) {
     $scope.weather = parse_weather_from_api();
+    $scope.units = "c"
+
+    $scope.toFarenheit = function() {
+        $scope.units = "f";
+    }
+
+    $scope.toCelsius = function() {
+        $scope.units = "c";
+    }
 });
 
 function parse_weather_from_api() { // TODO: add handling for coordinates
@@ -55,8 +64,14 @@ function parse_weather_from_api() { // TODO: add handling for coordinates
     var weather = {};
 
     weather.temperature = {
-        "variance": roundToTwo(Math.abs(json.main.temp_min - json.main.temp_max)),
-        "value": json.main.temp
+        "variance": {
+            "c": roundTo(Math.abs(json.main.temp_min - json.main.temp_max), 2),
+            "f": roundTo(Math.abs(kelvinToFarenheit(json.main.temp_min) - kelvinToFarenheit(json.main.temp_max)), 2),
+        },
+        "value": {
+            "c": roundTo(kelvinToCelsius(json.main.temp), 1),
+            "f": roundTo(kelvinToFarenheit(json.main.temp), 1),
+        }
     };
     weather.description = json.weather[0].description;
     weather.id = json.weather[0].id;
@@ -65,6 +80,14 @@ function parse_weather_from_api() { // TODO: add handling for coordinates
     return weather;
 };
 
-function roundToTwo(num) {
-    return +(Math.round(num + "e+2")  + "e-2");
+function kelvinToCelsius(value) {
+  return value - 273.15;
+}
+
+function kelvinToFarenheit(value) {
+  return value * 9/5 - 459.67;
+}
+
+function roundTo(num, decimalPlaces) {
+    return +(Math.round(num + "e+" + decimalPlaces) + "e-" + decimalPlaces);
 }

@@ -33,12 +33,16 @@
 
 <body ng-app="weatherApp" ng-controller="weatherController">
     <div class="container">
-        <!--<div class="col s12 m12 l12">-->
         <div class="center">
-            <!--Since K, deg F, and deg C are absolute (linear?) scales, no need to convert the variance :)-->
-            <h4>{{ weather.temperature.value }} &plusmn{{ weather.temperature.variance}}</h4>
+
+            <div class="animate-switch-container" ng-switch="units">
+                <!--TODO: this seems a bit repetititive - find a nicer way to do this -->
+                <h4 ng-switch-when="c">{{ weather.temperature.value.c }} &plusmn{{ weather.temperature.variance.c }} &deg<a href="#" ng-click="toFarenheit()">C</a></h4>
+                <h4 ng-switch-when="f">{{ weather.temperature.value.f }} &plusmn{{ weather.temperature.variance.f }} &deg<a href="#" ng-click="toCelsius()">F</a></h4>
+            </div>
+
             <h4><i class="wi {{ weather.iconCode }}"></i></h4>
-            <h6>{{ weather.description | uppercase }}</h4>
+            <h6>{{ weather.description | uppercase }}</h6>
 
         </div>
     </div>
