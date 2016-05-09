@@ -76,6 +76,7 @@ function parse_weather_from_api() { // TODO: add handling for coordinates
     weather.description = json.weather[0].description;
     weather.id = json.weather[0].id;
     weather.iconCode = "wi-owm-" + weather.id;
+    weather.location_name = json.name;
 
     return weather;
 };

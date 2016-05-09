@@ -35,6 +35,7 @@
     <div class="container">
         <div class="center">
 
+            <h2>{{ weather.location_name }}</h2>
             <div class="animate-switch-container" ng-switch="units">
                 <!--TODO: this seems a bit repetititive - find a nicer way to do this -->
                 <h4 ng-switch-when="c">{{ weather.temperature.value.c }} &plusmn{{ weather.temperature.variance.c }} &deg<a href="#" ng-click="toFarenheit()">C</a></h4>
