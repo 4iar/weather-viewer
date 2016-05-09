@@ -1,7 +1,18 @@
+"use strict"
 var app = angular.module("weatherApp", []);
+var $http = angular.injector(["ng"]).get("$http");
 
 app.controller("weatherController", function($scope) {
-    $scope.weather = parse_weather_from_api();
+
+    getUserLocation()
+        .then(function(coords) {
+            return requestWeatherJSON(coords);
+        })
+        .then(function(json) {
+            $scope.weather = parseWeatherFromJSON(json);
+            $scope.$apply();
+        });
+
     $scope.units = "c"
 
     $scope.toFarenheit = function() {
@@ -13,56 +24,32 @@ app.controller("weatherController", function($scope) {
     }
 });
 
-function parse_weather_from_api() { // TODO: add handling for coordinates
-    //DONT STEAL MY SUNSHINE
-    //http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=3ce6d91c31783161e36ac9d63fe94e49
+function getUserLocation() {
+    return new Promise(function(resolve, reject) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                resolve({
+                    "latitude": position.coords.latitude,
+                    "longitude": position.coords.longitude,
+                });
+            });
+        };
+    })
+};
 
-    var json = { // for testing
-        "coord": {
-            "lon": 138.93,
-            "lat": 34.97
-        },
-        "weather": [{
-            "id": 804,
-            "main": "Clouds",
-            "description": "overcast clouds",
-            "icon": "04n"
-        }],
-        "base": "stations",
-        "main": {
-            "temp": 292.76,
-            "pressure": 1015,
-            "humidity": 34,
-            "temp_min": 292.59,
-            "temp_max": 293.15
-        },
-        "wind": {
-            "speed": 2.57,
-            "deg": 170,
-            "gust": 3.08
-        },
-        "rain": {
-            "3h": 0.0225
-        },
-        "clouds": {
-            "all": 92
-        },
-        "dt": 1462747535,
-        "sys": {
-            "type": 3,
-            "id": 10354,
-            "message": 0.0286,
-            "country": "JP",
-            "sunrise": 1462650352,
-            "sunset": 1462700164
-        },
-        "id": 1851632,
-        "name": "Shuzenji",
-        "cod": 200
-    }
+function requestWeatherJSON(coords) {
+    return new Promise(function(resolve, reject) {
+        // TODO: check if there is an api option to get degF or degC directly
+        // this would cut out the need for two conversions (i.e. K->degC & degF vs degC->degF)
+        var api_url = sprintf("http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=3ce6d91c31783161e36ac9d63fe94e49", coords.latitude, coords.longitude);
+        $http.get(api_url).success(function(json) {
+            resolve(json);
+        });
+    });
+};
 
+function parseWeatherFromJSON(json) {
     var weather = {};
-
     weather.temperature = {
         "variance": {
             "c": roundTo(Math.abs(json.main.temp_min - json.main.temp_max), 2),
@@ -82,11 +69,11 @@ function parse_weather_from_api() { // TODO: add handling for coordinates
 };
 
 function kelvinToCelsius(value) {
-  return value - 273.15;
+    return value - 273.15;
 }
 
 function kelvinToFarenheit(value) {
-  return value * 9/5 - 459.67;
+    return value * 9 / 5 - 459.67;
 }
 
 function roundTo(num, decimalPlaces) {
