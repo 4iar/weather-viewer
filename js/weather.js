@@ -1,17 +1,27 @@
 "use strict"
 var app = angular.module("weatherApp", []);
-var $http = angular.injector(["ng"]).get("$http");
+//var $http = angular.injector(["ng"]).get("$http");
 
-app.controller("weatherController", function($scope) {
+app.controller("weatherController", function($scope, $http) {
 
-    getUserLocation()
-        .then(function(coords) {
-            return requestWeatherJSON(coords);
-        })
-        .then(function(json) {
-            $scope.weather = parseWeatherFromJSON(json);
-            $scope.$apply();
-        });
+    // put this in a function + handle refresh
+
+    showWeatherForUserLocation();
+
+    function showWeatherForUserLocation() {
+        getUserLocation()
+            .then(function(coords) {
+                var url = getWeatherApiURL(coords)
+                return $http.get(url);
+            })
+            .then(function(response) {
+                $scope.weather = parseWeatherFromJSON(response.data);
+                $scope.$apply();
+            })
+            .catch(function(response) {
+                console.log("request failed - handle me)")
+            });
+    };
 
     $scope.units = "c"
 
@@ -37,15 +47,9 @@ function getUserLocation() {
     })
 };
 
-function requestWeatherJSON(coords) {
-    return new Promise(function(resolve, reject) {
-        // TODO: check if there is an api option to get degF or degC directly
-        // this would cut out the need for two conversions (i.e. K->degC & degF vs degC->degF)
-        var api_url = sprintf("https://crossorigin.me/http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=3ce6d91c31783161e36ac9d63fe94e49", coords.latitude, coords.longitude);
-        $http.get(api_url).success(function(json) {
-            resolve(json);
-        });
-    });
+
+function getWeatherApiURL(coords) {
+    return sprintf("https://crossorigin.me/http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=3ce6d91c31783161e36ac9d63fe94e49", coords.latitude, coords.longitude);
 };
 
 function parseWeatherFromJSON(json) {
