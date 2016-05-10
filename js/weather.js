@@ -1,6 +1,5 @@
 "use strict"
 var app = angular.module("weatherApp", []);
-//var $http = angular.injector(["ng"]).get("$http");
 
 app.controller("weatherController", function($scope, $http) {
 
