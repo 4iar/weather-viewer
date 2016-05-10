@@ -1,37 +1,37 @@
 "use strict"
-var app = angular.module("weatherApp", []);
 
-app.controller("weatherController", function($scope, $http) {
+angular.module('weatherApp', [])
+    .controller("weatherController", function($scope, $http) {
 
-    // put this in a function + handle refresh
+        // put this in a function + handle refresh
 
-    showWeatherForUserLocation();
+        showWeatherForUserLocation();
 
-    function showWeatherForUserLocation() {
-        getUserLocation()
-            .then(function(coords) {
-                var url = getWeatherApiURL(coords)
-                return $http.get(url);
-            })
-            .then(function(response) {
-                $scope.weather = parseWeatherFromJSON(response.data);
-                $scope.$apply();
-            })
-            .catch(function(response) {
-                console.log("request failed - handle me)")
-            });
-    };
+        function showWeatherForUserLocation() {
+            getUserLocation()
+                .then(function(coords) {
+                    var url = getWeatherApiURL(coords)
+                    return $http.get(url);
+                })
+                .then(function(response) {
+                    $scope.weather = parseWeatherFromJSON(response.data);
+                    $scope.$apply();
+                })
+                .catch(function(response) {
+                    console.log("request failed - handle me)")
+                });
+        };
 
-    $scope.units = "c"
+        $scope.units = "c"
 
-    $scope.toFarenheit = function() {
-        $scope.units = "f";
-    }
+        $scope.toFarenheit = function() {
+            $scope.units = "f";
+        }
 
-    $scope.toCelsius = function() {
-        $scope.units = "c";
-    }
-});
+        $scope.toCelsius = function() {
+            $scope.units = "c";
+        }
+    });
 
 function getUserLocation() {
     return new Promise(function(resolve, reject) {
