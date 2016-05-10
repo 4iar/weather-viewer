@@ -36,8 +36,8 @@
 </head>
 
 <body ng-app="weatherApp" ng-controller="weatherController">
-    <div class="container">
-        <div class="center">
+    <div class="container" id="main">
+        <div class="center" id="weather_display" ng-show="state.ready">
 
             <h2>{{ weather.location_name }}</h2>
             <div class="animate-switch-container" ng-switch="units">
@@ -50,14 +50,18 @@
             <h6>{{ weather.description | uppercase }}</h6>
 
         </div>
+        <div class="center" id="status_display" ng-show="!state.ready">
+            <h5>{{ state.message }}</h5>
+
+            <h2 ng-show="(state.http === 'fail')">Failed to access the API</h2>
+            <h2 ng-show="failed">fail</h2>
+
+            <div class="progress">
+                <div class="indeterminate"></div>
+            </div>
+
+        </div>
     </div>
 </body>
-
-
-
-
-
-
-
 
 </html>

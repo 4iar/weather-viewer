@@ -7,21 +7,33 @@ angular.module('weatherApp', [])
 
         showWeatherForUserLocation();
 
+        $scope.state = {
+            "ready": false,
+            "failed": false,
+            "message": "finding your location",
+        };
+
         function showWeatherForUserLocation() {
             getUserLocation()
                 .then(function(coords) {
+                    $scope.state.message = "requesting weather information from the API";
+
                     var url = getWeatherApiURL(coords)
                     return $http.get(url);
                 })
                 .then(function(response) {
                     $scope.weather = parseWeatherFromJSON(response.data);
+                    $scope.state.ready = true;
+
                     $scope.$apply();
                 })
                 .catch(function(response) {
-                    console.log("request failed - handle me)")
+                    $scope.state.message = "could not contact the API server";
+                    $scope.state.failed = true;
                 });
         };
 
+        // separate this out into another controller?
         $scope.units = "c"
 
         $scope.toFarenheit = function() {
